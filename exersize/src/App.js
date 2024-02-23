@@ -1,62 +1,90 @@
 import { useState } from "react";
 
-const faqs = [
-  {
-    title: "Where are these chairs assembled?",
-    text: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusantium, quaerat temporibus quas dolore provident nisi ut aliquid ratione beatae sequi aspernatur veniam repellendus.",
-  },
-  {
-    title: "How long do I have to return my chair?",
-    text: "Pariatur recusandae dignissimos fuga voluptas unde optio nesciunt commodi beatae, explicabo natus.",
-  },
-  {
-    title: "Do you ship to countries outside the EU?",
-    text: "Excepturi velit laborum, perspiciatis nemo perferendis reiciendis aliquam possimus dolor sed! Dolore laborum ducimus veritatis facere molestias!",
-  },
-];
-
 export default function App() {
   return (
-    <div>
-      <Accordion />
+    <div style={{ margin: "20px" }}>
+      <TipCalculator />
     </div>
   );
 }
 
-function Accordion() {
-  const [openIndex, setOpenIndex] = useState(null);
+function TipCalculator() {
+  const [bill, setBill] = useState(0);
+  const [service1, setService1] = useState(0);
+  const [service2, setService2] = useState(0);
 
-  const handleItemClick = (index) => {
-    setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
+  const reset = () => {
+    setBill(0);
+    setService1(0);
+    setService2(0);
   };
 
   return (
-    <div className="accordion">
-      {faqs.map((item, index) => (
-        <Item
-          key={item.title}
-          itemText={item.text}
-          itemTitle={item.title}
-          index={index}
-          isOpen={openIndex === index}
-          onClick={() => handleItemClick(index)}
-        />
-      ))}
+    <div>
+      <Tip bill={bill} setBill={setBill} />
+      <SelectPercentage percentage={service1} setPercentage={setService1}>
+        How did you like the service?
+      </SelectPercentage>
+      <SelectPercentage percentage={service2} setPercentage={setService2}>
+        How did your friend like the service?
+      </SelectPercentage>
+      <CalculateBillValue
+        service1={service1}
+        service2={service2}
+        bill={bill}
+        reset={reset}
+      />
     </div>
   );
 }
 
-function Item({ itemText, itemTitle, index, isOpen, onClick }) {
+function CalculateBillValue({ service1, service2, bill, reset }) {
+  const tip = bill * ((parseInt(service1) + parseInt(service2)) / 2 / 100); // Convert to numbers using parseInt
+
+  console.log("bill", bill);
+
+  return bill > 0 ? (
+    <>
+      <p>
+        you pay {bill} {tip}(${bill} + ${tip})
+      </p>
+      <button onClick={() => reset()}>reset</button>
+    </>
+  ) : (
+    ""
+  );
+}
+
+function Tip({ bill, setBill }) {
+  console.log(bill);
   return (
-    <div onClick={onClick} className={`item ${isOpen ? "open" : ""}`}>
-      <>
-        <div className="number">
-          {index < 10 ? `0${index + 1}` : `${index + 1}`}
-        </div>
-        <p className="title">{itemTitle}</p>
-        <p className="text">{isOpen ? "-" : "+"}</p>
-        {isOpen && <div className="content-box">{itemText}</div>}
-      </>
+    <div>
+      <label>how much was the bill</label>
+      <input
+        placeholder="bill value"
+        value={bill}
+        onChange={(e) => setBill(e.target.value)}
+      ></input>
+    </div>
+  );
+}
+
+function SelectPercentage({ children, percentage, setPercentage }) {
+  return (
+    <div>
+      <label>{children}</label>
+      <select
+        value={percentage}
+        onChange={(e) => {
+          setPercentage(e.target.value);
+          console.log(e.target.value);
+        }}
+      >
+        <option value={0}>Dissatisfied (0%)</option>
+        <option value={5}>It was okay (5%)</option>
+        <option value={10}>It was good (10%)</option>
+        <option value={20}>Absolutely amazing! (20%)</option>
+      </select>
     </div>
   );
 }
