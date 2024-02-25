@@ -34,31 +34,35 @@ export default function App() {
 }
 
 function TextExpander({
-  collapsedNumWords = 20,
-  // expandButtonText = "Show text",
-  // collapseButtonText = "Collapse text",
-  buttonColor = "#ff6622",
+  collapsedNumWords = 10,
+  expandButtonText = "Show more",
+  collapseButtonText = "Show less",
+  buttonColor = "blue",
   children,
-  defbuttonText = "Show text",
+  expanded = false,
   className = "",
 }) {
-  const [buttonText, setbuttonText] = useState(defbuttonText);
+  const buttonStyling = {
+    color: buttonColor,
+    background: "none",
+    border: "none",
+    font: "inherit",
+    cursor: "pointer",
+    marginLeft: "6px",
+  };
+  const [expandText, setExpendText] = useState(expanded);
   console.log(typeof children);
   return (
     <>
       <div className={className}>
-        {buttonText === "Show text"
-          ? children.slice(0, collapsedNumWords)
+        {expandText
+          ? children.split(" ").slice(0, collapsedNumWords).join(" ") + "..."
           : children}
         <button
-          style={{ backgroundColor: buttonColor }}
-          onClick={() =>
-            buttonText === "Show text"
-              ? setbuttonText("Collapse text")
-              : setbuttonText("Show text")
-          }
+          style={buttonStyling}
+          onClick={() => setExpendText((prevexpandText) => !prevexpandText)}
         >
-          {buttonText}
+          {!expandText ? collapseButtonText : expandButtonText}
         </button>
       </div>
       {/* <hr style={{ border: "1px solid gray" }} /> */}
