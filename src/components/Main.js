@@ -9,10 +9,11 @@ import FinishScreen from "./FinishScreen";
 const initialState = {
   questions: [],
   status: "loading",
-  index: 12,
+  index: 13,
   answare: null,
   points: 0,
   highScore: 0,
+  appTimer: null,
 };
 
 function reducer(state, action) {
@@ -22,12 +23,15 @@ function reducer(state, action) {
         ...state,
         questions: action.payload,
         status: "ready",
-        finshed: 0,
       };
     case "datataFaild":
       return { ...state, status: "error" };
     case "start":
-      return { ...state, status: "active" };
+      return {
+        ...state,
+        status: "active",
+        appTimer: state.questions.length * 30,
+      };
     case "newAnswer":
       const question = state.questions[state.index];
       return {
@@ -46,6 +50,13 @@ function reducer(state, action) {
         status: "finished",
         highScore:
           state.points > state.highScore ? state.points : state.highScore,
+        appTimer: null,
+      };
+    case "timer":
+      return {
+        ...state,
+        appTimer: state.appTimer > 0 ? state.appTimer - 1 : state.appTimer,
+        status: state.appTimer === 0 ? "finished" : state.status,
       };
     case "reset":
       return { ...initialState, questions: state.questions, status: "ready" };
@@ -56,17 +67,29 @@ function reducer(state, action) {
 
 export default function Main() {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const maxPossiblePoints = state.questions.reduce(
-    (PrevValue, currValue) => (PrevValue += currValue.points),
-    0
-  );
   useEffect(function () {
     fetch("http://localhost:3000/questions")
       .then((res) => res.json())
       .then((data) => dispatch({ type: "dataRecieved", payload: data }))
       .catch(() => dispatch({ type: "datataFaild" }));
   }, []);
+
+  useEffect(
+    function () {
+      const id = setInterval(() => {
+        dispatch({ type: "timer" });
+      }, 1000);
+
+      return () => clearInterval(id);
+    },
+    [state.appTimer]
+  );
+
+  const maxPossiblePoints = state.questions.reduce(
+    (PrevValue, currValue) => (PrevValue += currValue.points),
+    0
+  );
+
   return (
     <main className="main">
       {state.status === "loading" && <Loader />}
@@ -93,6 +116,7 @@ export default function Main() {
             questions={state.questions}
             i={state.index}
             answare={state.answare}
+            appTimer={state.appTimer}
           />
         </>
       )}

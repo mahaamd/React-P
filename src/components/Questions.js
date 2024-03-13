@@ -1,6 +1,14 @@
 import React from "react";
 import Option from "./Option";
-export default function Questions({ answare, questions, i, dispatch }) {
+import Timer from "./Timer";
+
+export default function Questions({
+  answare,
+  questions,
+  i,
+  dispatch,
+  appTimer,
+}) {
   const isContinued = i < questions.length - 1;
   return (
     <div>
@@ -12,7 +20,7 @@ export default function Questions({ answare, questions, i, dispatch }) {
           answare={answare}
         />
       </div>
-
+      <Timer appTimer={appTimer} />
       {answare !== null && (
         <button
           className="btn btn-ui"
