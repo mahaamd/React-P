@@ -1,11 +1,16 @@
 import React from "react";
+import { useQuestion } from "../context/QuestionProvider";
 
-export default function FinishScreen({
-  dispatch,
-  highScore,
-  points,
-  maxPossiblePoints,
-}) {
+export default function FinishScreen() {
+  // dispatch={dispatch}
+
+  const { highScore, points, questions, reset } = useQuestion();
+
+  const maxPossiblePoints = questions.reduce(
+    (PrevValue, currValue) => (PrevValue += currValue.points),
+    0
+  );
+
   const persentage = (points / maxPossiblePoints) * 100;
   return (
     <>
@@ -14,10 +19,7 @@ export default function FinishScreen({
         {Math.ceil(persentage)}%)
       </div>
       <p className="highscore">highScore({highScore})</p>
-      <button
-        onClick={() => dispatch({ type: "reset" })}
-        className="btn btn-ui"
-      >
+      <button onClick={() => reset()} className="btn btn-ui">
         reset
       </button>
     </>

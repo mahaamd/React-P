@@ -1,33 +1,29 @@
 import React from "react";
 import Option from "./Option";
 import Timer from "./Timer";
+import { useQuestion } from "../context/QuestionProvider";
 
-export default function Questions({
-  answare,
-  questions,
-  i,
-  dispatch,
-  appTimer,
-}) {
-  const isContinued = i < questions.length - 1;
+export default function Questions() {
+  const { questions, index, answare, appTimer, allAnswered, newQuestion } =
+    useQuestion();
+
+  // dispatch={dispatch}
+
+  const isContinued = index < questions.length - 1;
+  console.log(index);
+  console.log(isContinued);
   return (
     <div>
-      <h4>{questions[i].question}</h4>
+      <h4>{questions[index].question}</h4>
       <div>
-        <Option
-          questions={questions[i]}
-          dispatch={dispatch}
-          answare={answare}
-        />
+        <Option />
       </div>
       <Timer appTimer={appTimer} />
       {answare !== null && (
         <button
           className="btn btn-ui"
           onClick={() => {
-            isContinued
-              ? dispatch({ type: "newQuestion" })
-              : dispatch({ type: "allAnswered" });
+            isContinued ? newQuestion() : allAnswered();
           }}
         >
           {isContinued ? "Next" : "finished "}

@@ -1,17 +1,25 @@
 import React from "react";
+import { useQuestion } from "../context/QuestionProvider";
 
-export default function Option({ answare, questions, dispatch }) {
+export default function Option() {
+  // { answare, questions, dispatch }
+  const { questions, answare, newAnsware, index } = useQuestion();
+  console.log("answare", answare);
   const hasAnswared = answare !== null;
+  // const hasAnswared = null;
+  console.log("hasans", hasAnswared);
+  console.log(questions[index].options);
+
   return (
     <div className="options">
-      {questions.options.map((option, index) => (
+      {questions[index].options.map((option, QIndex) => (
         <button
-          onClick={() => dispatch({ type: "newAnswer", payload: index })}
+          onClick={() => newAnsware(QIndex)}
           key={option}
           disabled={hasAnswared}
-          className={`btn btn-option ${index === answare ? "answer" : ""} ${
+          className={`btn btn-option ${QIndex === answare ? "answer" : ""} ${
             hasAnswared
-              ? index === questions.correctOption
+              ? QIndex === questions[index].correctOption
                 ? "correct"
                 : "wrong"
               : ""
